@@ -3,6 +3,7 @@ let player = {
     cash: 2,
     level: 4,
     exp: 302,
+    nextLevelExp: 500,
     cars: [
         { name: "Muscle Car", type: "muscle", color: "#e74c3c", x: 5, y: 1 },
         { name: "Hatch Vermelho", type: "hatch", color: "#e67e22", x: 4, y: 3 },
@@ -14,11 +15,13 @@ let player = {
 
 let editMode = false;
 let selectedCar = null;
-let customTargetCar = null;
 
 function loadGame() {
     const saved = localStorage.getItem("cartowner_pro_save");
-    if (saved) player = JSON.parse(saved);
+    if (saved) {
+        player = JSON.parse(saved);
+        if (!player.nextLevelExp) player.nextLevelExp = 500;
+    }
 }
 
 function saveGame() {
@@ -208,7 +211,7 @@ canvas.addEventListener("click", (e) => {
                     saveGame();
                     updateUI();
                 } else {
-                    alert("Esta vaga já está ocupada!");
+                    alert("Esta vaga já está ocupada por outro veículo!");
                 }
             }
         } else {
@@ -219,28 +222,54 @@ canvas.addEventListener("click", (e) => {
             }
         }
     } else {
-        // Modo normal: clicar em um carro abre o painel de customização/pintura
         const foundCar = player.cars.find(c => c.x === clickedTile.x && c.y === clickedTile.y);
         if (foundCar) {
-            customTargetCar = foundCar;
             const newColor = prompt(`Customizar ${foundCar.name}:\nDigite o código da nova cor HEX (ex: #e74c3c, #3498db, #f1c40f, #9b59b6):`, foundCar.color);
             if (newColor) {
                 foundCar.color = newColor;
                 saveGame();
                 updateUI();
-                alert("Carro repintado com sucesso na oficina!");
             }
         }
     }
 });
 
 document.querySelectorAll(".flex button, button").forEach(btn => {
-    if (btn.textContent.includes("Edit Garage")) {
+    const text = btn.textContent.trim();
+    if (text.includes("Edit Garage")) {
         btn.addEventListener("click", () => {
             editMode = !editMode;
             selectedCar = null;
-            if (editMode) alert("Modo de Edição: Clique em um carro e depois na nova vaga.");
+            if (editMode) alert("Modo de Edição Ativado! Clique em um carro e depois na vaga de destino.");
             updateUI();
+        });
+    } else if (text.includes("Challenges")) {
+        btn.addEventListener("click", () => {
+            player.coins += 150;
+            player.exp += 50;
+            if (player.exp >= player.nextLevelExp) {
+                player.level += 1;
+                player.exp -= player.nextLevelExp;
+                player.nextLevelExp += 250;
+            }
+            saveGame();
+            updateUI();
+            alert("🏁 Desafio Concluído! +150 moedas ganhas!");
+        });
+    } else if (text.includes("Car Show")) {
+        btn.addEventListener("click", () => {
+            player.coins += 100;
+            saveGame();
+            updateUI();
+            alert("🏆 Car Show: Premiação de +100 moedas resgatada!");
+        });
+    } else if (text.includes("Mail")) {
+        btn.addEventListener("click", () => {
+            alert("📬 Caixa de Entrada: Nenhuma nova mensagem.");
+        });
+    } else if (text.includes("Stats")) {
+        btn.addEventListener("click", () => {
+            alert(`📊 Status do Jogador:\n- Nível: ${player.level}\n- Carros na Frota: ${player.cars.length}\n- Moedas: ${player.coins}\n- Cash: ${player.cash}`);
         });
     }
 });
@@ -250,8 +279,16 @@ document.getElementById("btn-buy").addEventListener("click", () => modal.classLi
 document.getElementById("close-modal").addEventListener("click", () => modal.classList.add("hidden"));
 
 document.getElementById("work-mechanic").addEventListener("click", () => {
-    player.coins += 35;
-    player.exp += 20;
+    player.coins += 40;
+    player.exp += 35;
+
+    if (player.exp >= player.nextLevelExp) {
+        player.level += 1;
+        player.exp -= player.nextLevelExp;
+        player.nextLevelExp += 250;
+        alert(`Parabéns! Você subiu para o Level ${player.level}!`);
+    }
+
     updateUI();
     saveGame();
 });
@@ -259,13 +296,13 @@ document.getElementById("work-mechanic").addEventListener("click", () => {
 document.getElementById("buy-sport-car").addEventListener("click", () => {
     if (player.coins >= 300) {
         player.coins -= 300;
-        const newCarsList = ["Super Esportivo", "Drift Master", "Street Racer", "Turbo Coupe"];
+        const newCarsList = ["Super Esportivo", "SUV Blindado", "Caminhonete 4x4", "Hypercar GT"];
         const randomName = newCarsList[Math.floor(Math.random() * newCarsList.length)];
-        const randomColors = ["#9b59b6", "#1abc9c", "#e74c3c", "#f1c40f", "#34495e"];
+        const randomColors = ["#9b59b6", "#1abc9c", "#e74c3c", "#f1c40f", "#34495e", "#e67e22"];
         
         player.cars.push({
             name: randomName,
-            type: "sport",
+            type: "advanced",
             color: randomColors[Math.floor(Math.random() * randomColors.length)],
             x: Math.floor(Math.random() * 6),
             y: Math.floor(Math.random() * 6)
@@ -273,9 +310,9 @@ document.getElementById("buy-sport-car").addEventListener("click", () => {
         updateUI();
         saveGame();
         modal.classList.add("hidden");
-        alert("Parabéns! Novo carro adicionado!");
+        alert(`Parabéns! ${randomName} comprado e estacionado na garagem!`);
     } else {
-        alert("Moedas insuficientes!");
+        alert("Moedas insuficientes na sua conta!");
     }
 });
 
