@@ -3,35 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Towner 3D Isométrico</title>
+    <title>Car Towner - Sua Garagem</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-wrapper">
-        <!-- HUD SUPERIOR CLÁSSICO CAR TOWN -->
+        <!-- HUD SUPERIOR ESQUERDO (Velocímetro & Nível) -->
         <header class="top-hud">
-            <div class="hud-item level-badge">
-                <span>Nível</span>
-                <span id="player-level">1</span>
+            <div class="speedometer-box">
+                <div class="speed-dial"></div>
+                <div class="level-info">
+                    <span class="level-text">LEVEL <span id="player-level">4</span></span>
+                    <span id="player-exp" class="exp-text">0000302</span>
+                </div>
             </div>
-            <div class="hud-item money-display">
-                <span>💰 $<span id="coins">150</span></span>
+            <div class="currency-hud">
+                <div class="currency-item">🪙 <span id="coins">888</span></div>
+                <div class="currency-item">💵 <span id="cash">2</span></div>
             </div>
-            <div class="hud-item rep-display">
-                <span>⭐ <span id="reputation">1</span></span>
+            <div class="top-right-tools">
+                <button class="tool-icon-btn">📷 Picture</button>
             </div>
         </header>
 
-        <!-- TELA DO JOGO EM CANVAS ISOMÉTRICO (3D) -->
-        <div class="game-viewport">
-            <canvas id="isometricCanvas" width="840" height="420"></canvas>
-            
-            <!-- PAINEL DE CONTROLE FLUTUANTE -->
-            <div class="floating-controls">
-                <button id="work-btn" class="cartown-btn primary">Trabalhar na Oficina (+$15)</button>
-                <button id="upgrade-engine-btn" class="cartown-btn success">Melhorar Motor ($50)</button>
-                <button id="buy-car-btn" class="cartown-btn warning">Comprar Esportivo ($300)</button>
+        <!-- ÁREA CENTRAL DO JOGO (GARAGEM ISOMÉTRICA) -->
+        <main class="game-viewport">
+            <canvas id="isometricCanvas" width="920" height="460"></canvas>
+        </main>
+
+        <!-- BARRA DE MENU INFERIOR CLÁSSICA (ICONES) -->
+        <nav class="bottom-dock">
+            <button class="dock-btn" id="btn-edit">
+                <span>🚧</span> Edit Garage
+            </button>
+            <button class="dock-btn" id="btn-stats">
+                <span>📊</span> Stats
+            </button>
+            <button class="dock-btn" id="btn-mail">
+                <span>✉️</span> Mail
+            </button>
+            <button class="dock-btn" id="btn-hire">
+                <span>👥</span> Hire
+            </button>
+            <button class="dock-btn active" id="btn-buy">
+                <span>🚗</span> Buy Cars
+            </button>
+            <button class="dock-btn" id="btn-show">
+                <span>🏆</span> Car Show
+            </button>
+            <button class="dock-btn" id="btn-challenges">
+                <span>🏁</span> Challenges
+            </button>
+        </nav>
+    </div>
+
+    <!-- MODAL DE LOJA / AÇÕES -->
+    <div id="game-modal" class="game-modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">Concessionária Car Towner</h3>
+            <div id="modal-body">
+                <p>Compre novos veículos para preencher suas vagas na garagem!</p>
+                <button id="buy-sport-car" class="cartown-btn success">Comprar Carro Esportivo ($300)</button>
+                <button id="work-mechanic" class="cartown-btn primary">Trabalhar na Oficina (+$25)</button>
             </div>
+            <button id="close-modal" class="close-btn">X</button>
         </div>
     </div>
 
