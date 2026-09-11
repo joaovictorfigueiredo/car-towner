@@ -14,6 +14,7 @@ let player = {
 
 let editMode = false;
 let selectedCar = null;
+let customTargetCar = null;
 
 function loadGame() {
     const saved = localStorage.getItem("cartowner_pro_save");
@@ -39,7 +40,6 @@ function isoToScreen(isoX, isoY) {
     };
 }
 
-// Conversão inversa de Tela (Mouse) para Coordenadas do Grid Isométrico (x, y)
 function screenToIso(screenX, screenY) {
     const tileW = 64;
     const tileH = 32;
@@ -59,13 +59,11 @@ function screenToIso(screenX, screenY) {
 }
 
 function drawProCar(pt, car, isSelected) {
-    // Sombra suave no chão
     ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
     ctx.beginPath();
     ctx.ellipse(pt.x, pt.y + 14, 28, 14, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Sombra do corpo do veículo
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.beginPath();
     ctx.moveTo(pt.x - 26, pt.y + 6);
@@ -77,7 +75,6 @@ function drawProCar(pt, car, isSelected) {
     ctx.closePath();
     ctx.fill();
 
-    // Carroceria principal
     ctx.fillStyle = car.color;
     ctx.beginPath();
     ctx.moveTo(pt.x, pt.y - 12);
@@ -90,7 +87,6 @@ function drawProCar(pt, car, isSelected) {
     ctx.strokeStyle = isSelected ? "#f1c40f" : "#111";
     ctx.stroke();
 
-    // Teto / Cabine
     ctx.fillStyle = "#2c3e50";
     ctx.beginPath();
     ctx.moveTo(pt.x, pt.y - 6);
@@ -101,7 +97,6 @@ function drawProCar(pt, car, isSelected) {
     ctx.fill();
     ctx.stroke();
 
-    // Para-brisa brilhante
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.beginPath();
     ctx.moveTo(pt.x, pt.y - 4);
@@ -111,7 +106,6 @@ function drawProCar(pt, car, isSelected) {
     ctx.closePath();
     ctx.fill();
 
-    // Indicador visual se estiver selecionado para mover
     if (isSelected) {
         ctx.strokeStyle = "#f39c12";
         ctx.lineWidth = 2;
@@ -120,7 +114,6 @@ function drawProCar(pt, car, isSelected) {
         ctx.stroke();
     }
 
-    // Placa de identificação do carro
     ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
     ctx.fillRect(pt.x - 35, pt.y - 28, 70, 16);
     ctx.strokeStyle = isSelected ? "#f1c40f" : "#f39c12";
@@ -136,7 +129,6 @@ function drawProCar(pt, car, isSelected) {
 function drawIsometricScene() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Paredes e Estrutura da Garagem
     const gradWall = ctx.createLinearGradient(0, 0, 0, 300);
     gradWall.addColorStop(0, "#f9f6ee");
     gradWall.addColorStop(1, "#d5cebe");
@@ -155,7 +147,6 @@ function drawIsometricScene() {
     ctx.lineWidth = 4;
     ctx.stroke();
 
-    // Grid do Piso Isométrico (8x8)
     for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
             const pt = isoToScreen(x, y);
@@ -167,7 +158,7 @@ function drawIsometricScene() {
             ctx.closePath();
 
             if (editMode && selectedCar) {
-                ctx.fillStyle = "rgba(46, 204, 113, 0.3)"; // Destaca o piso em modo de edição
+                ctx.fillStyle = "rgba(46, 204, 113, 0.3)";
             } else if (x < 4 && y > 3) {
                 ctx.fillStyle = (x + y) % 2 === 0 ? "#1e1e1e" : "#2c3e50";
             } else if (x > 4 && y > 2) {
@@ -182,7 +173,6 @@ function drawIsometricScene() {
         }
     }
 
-    // Renderização dos carros ordenada por profundidade
     let sortedCars = [...player.cars].sort((a, b) => (a.x + a.y) - (b.x + b.y));
     
     sortedCars.forEach(car => {
@@ -199,7 +189,6 @@ function updateUI() {
     drawIsometricScene();
 }
 
-// Clique no Canvas para selecionar e reposicionar carros no Modo Edição
 canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -209,50 +198,53 @@ canvas.addEventListener("click", (e) => {
 
     if (editMode) {
         if (selectedCar) {
-            // Se já tem um carro selecionado, move para o tile clicado (se estiver dentro do grid 0-7)
             if (clickedTile.x >= 0 && clickedTile.x < 8 && clickedTile.y >= 0 && clickedTile.y < 8) {
-                // Verifica se já tem outro carro na vaga
                 const occupant = player.cars.find(c => c.x === clickedTile.x && c.y === clickedTile.y);
                 if (!occupant) {
                     selectedCar.x = clickedTile.x;
                     selectedCar.y = clickedTile.y;
                     selectedCar = null;
                     editMode = false;
-                    document.getElementById("edit-garage-btn").style.background = "";
                     saveGame();
                     updateUI();
                 } else {
-                    alert("Esta vaga já está ocupada por outro veículo!");
+                    alert("Esta vaga já está ocupada!");
                 }
             }
         } else {
-            // Seleciona o carro na coordenada clicada
             const foundCar = player.cars.find(c => c.x === clickedTile.x && c.y === clickedTile.y);
             if (foundCar) {
                 selectedCar = foundCar;
                 updateUI();
             }
         }
+    } else {
+        // Modo normal: clicar em um carro abre o painel de customização/pintura
+        const foundCar = player.cars.find(c => c.x === clickedTile.x && c.y === clickedTile.y);
+        if (foundCar) {
+            customTargetCar = foundCar;
+            const newColor = prompt(`Customizar ${foundCar.name}:\nDigite o código da nova cor HEX (ex: #e74c3c, #3498db, #f1c40f, #9b59b6):`, foundCar.color);
+            if (newColor) {
+                foundCar.color = newColor;
+                saveGame();
+                updateUI();
+                alert("Carro repintado com sucesso na oficina!");
+            }
+        }
     }
 });
 
-// Botão Edit Garage
-const editBtn = document.getElementById("edit-garage-btn") || document.querySelector("button:nth-child(1)");
-// Criando ou ajustando evento para o botão de editar garagem existente na UI inferior
 document.querySelectorAll(".flex button, button").forEach(btn => {
     if (btn.textContent.includes("Edit Garage")) {
-        btn.id = "edit-garage-btn";
         btn.addEventListener("click", () => {
             editMode = !editMode;
             selectedCar = null;
-            btn.style.background = editMode ? "#f39c12" : "";
-            if (editMode) alert("Modo de Edição Ativado! Clique no carro que deseja mover e depois clique na nova vaga.");
+            if (editMode) alert("Modo de Edição: Clique em um carro e depois na nova vaga.");
             updateUI();
         });
     }
 });
 
-// Configurações de modais e botões padrão
 const modal = document.getElementById("game-modal");
 document.getElementById("btn-buy").addEventListener("click", () => modal.classList.remove("hidden"));
 document.getElementById("close-modal").addEventListener("click", () => modal.classList.add("hidden"));
@@ -281,9 +273,9 @@ document.getElementById("buy-sport-car").addEventListener("click", () => {
         updateUI();
         saveGame();
         modal.classList.add("hidden");
-        alert("Parabéns! Novo carro adicionado à sua garagem!");
+        alert("Parabéns! Novo carro adicionado!");
     } else {
-        alert("Moedas insuficientes na sua conta!");
+        alert("Moedas insuficientes!");
     }
 });
 
