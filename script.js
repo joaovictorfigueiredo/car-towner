@@ -1,70 +1,82 @@
-// Estado inicial do jogador
+// Estado estruturado do jogador e da garagem (com múltiplos carros)
 let player = {
-    coins: 100,
+    coins: 150,
     reputation: 1,
-    car: {
-        name: "Fusca Clássico",
-        speed: 10,
-        engineLevel: 1
-    }
+    level: 1,
+    cars: [
+        { id: 1, name: "Fusca Clássico", speed: 10, engineLevel: 1 }
+    ]
 };
 
-// Carregar dados salvos anteriormente no navegador (LocalStorage)
+// Carregar dados salvos
 function loadGame() {
-    const savedData = localStorage.getItem("cartowner_save");
+    const savedData = localStorage.getItem("cartowner_save_v2");
     if (savedData) {
         player = JSON.parse(savedData);
     }
 }
 
-// Salvar progresso automaticamente
+// Salvar progresso
 function saveGame() {
-    localStorage.setItem("cartowner_save", JSON.stringify(player));
+    localStorage.setItem("cartowner_save_v2", JSON.stringify(player));
 }
 
-// Elementos da tela
+// Elementos da interface
 const coinsEl = document.getElementById("coins");
 const reputationEl = document.getElementById("reputation");
-const carNameEl = document.getElementById("car-name");
-const carSpeedEl = document.getElementById("car-speed");
+const playerLevelEl = document.getElementById("player-level");
+const carsGridEl = document.getElementById("cars-grid");
 const workBtn = document.getElementById("work-btn");
 const upgradeEngineBtn = document.getElementById("upgrade-engine-btn");
 const buySportCarBtn = document.getElementById("buy-sport-car");
 
-// Atualizar informações na tela
+// Atualizar interface e renderizar vagas da garagem
 function updateUI() {
     coinsEl.textContent = player.coins;
     reputationEl.textContent = player.reputation;
-    carNameEl.textContent = player.car.name;
-    carSpeedEl.textContent = player.car.speed;
+    playerLevelEl.textContent = player.level;
+    
+    // Renderizar carros estacionados na garagem
+    carsGridEl.innerHTML = "";
+    player.cars.forEach(car => {
+        const card = document.createElement("div");
+        card.className = "car-mini-card";
+        card.innerHTML = `
+            🚗
+            <h4>${car.name}</h4>
+            <p>Vel: ${car.speed}</p>
+            <p>Motor: Nv.${car.engineLevel}</p>
+        `;
+        carsGridEl.appendChild(card);
+    });
 }
 
 // Sistema de navegação por abas
-document.querySelectorAll(".nav-btn").forEach(button => {
+document.querySelectorAll(".tab-btn").forEach(button => {
     button.addEventListener("click", (e) => {
-        document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
-        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
         
         e.target.classList.add("active");
-        const targetTab = document.getElementById(e.target.getAttribute("data-target"));
-        targetTab.classList.add("active");
+        document.getElementById(e.target.getAttribute("data-target")).classList.add("active");
     });
 });
 
-// Ação de trabalhar na oficina para ganhar dinheiro
+// Ação de trabalhar na oficina
 workBtn.addEventListener("click", () => {
     player.coins += 15;
     updateUI();
     saveGame();
 });
 
-// Ação de comprar melhoria de motor
+// Melhorar motor do primeiro carro da garagem
 upgradeEngineBtn.addEventListener("click", () => {
-    let cost = 50 * player.car.engineLevel;
+    let mainCar = player.cars[0];
+    let cost = 50 * mainCar.engineLevel;
     if (player.coins >= cost) {
         player.coins -= cost;
-        player.car.engineLevel += 1;
-        player.car.speed += 5;
+        mainCar.engineLevel += 1;
+        mainCar.speed += 8;
         alert("Motor melhorado com sucesso!");
         updateUI();
         saveGame();
@@ -73,13 +85,17 @@ upgradeEngineBtn.addEventListener("click", () => {
     }
 });
 
-// Ação de comprar novo carro
+// Comprar novo carro esportivo para a garagem
 buySportCarBtn.addEventListener("click", () => {
     if (player.coins >= 300) {
         player.coins -= 300;
-        player.car.name = "Carro Esportivo";
-        player.car.speed = 40;
-        alert("Parabéns! Você comprou um Carro Esportivo!");
+        player.cars.push({
+            id: player.cars.length + 1,
+            name: "Carro Esportivo",
+            speed: 45,
+            engineLevel: 1
+        });
+        alert("Parabéns! Novo carro adicionado à garagem!");
         updateUI();
         saveGame();
     } else {
@@ -87,6 +103,6 @@ buySportCarBtn.addEventListener("click", () => {
     }
 });
 
-// Inicializar carregando dados e interface
+// Inicialização
 loadGame();
 updateUI();

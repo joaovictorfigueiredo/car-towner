@@ -3,44 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Towner - Sua Garagem</title>
+    <title>Car Towner</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <header>
-            <h1>Car Towner</h1>
-            <div class="stats">
-                <span>Moedas: $<span id="coins">100</span></span>
-                <span>Reputação: <span id="reputation">1</span></span>
+    <div class="game-wrapper">
+        <!-- BARRA SUPERIOR ESTILO CLASSIC CAR TOWN -->
+        <header class="top-hud">
+            <div class="hud-item level-badge">
+                <span id="level-title">Nível</span>
+                <span id="player-level">1</span>
+            </div>
+            <div class="hud-item money-display">
+                <span class="coin-icon">💰</span>
+                <span id="coins">100</span>
+            </div>
+            <div class="hud-item rep-display">
+                ⭐ <span id="reputation">1</span>
             </div>
         </header>
 
-        <nav class="game-nav">
-            <button class="nav-btn active" data-target="garage-tab">Garagem</button>
-            <button class="nav-btn" data-target="shop-tab">Loja de Carros</button>
-        </nav>
+        <!-- ÁREA PRINCIPAL DA GARAGEM (VISÃO ISOMÉTRICA/PAINEL) -->
+        <main class="garage-container">
+            <div class="navigation-tabs">
+                <button class="tab-btn active" data-target="tab-garage">Minha Garagem</button>
+                <button class="tab-btn" data-target="tab-shop">Concessionária</button>
+            </div>
 
-        <main>
             <!-- ABA GARAGEM -->
-            <div id="garage-tab" class="tab-content active">
-                <div class="car-card">
-                    <h2 id="car-name">Fusca Clássico</h2>
-                    <p>Velocidade: <span id="car-speed">10</span></p>
-                    <button id="work-btn" class="action-btn">Trabalhar na Oficina ($15)</button>
+            <div id="tab-garage" class="tab-pane active">
+                <div class="workshop-floor">
+                    <h3>Pátio de Veículos</h3>
+                    <div id="cars-grid" class="cars-grid">
+                        <!-- Os carros comprados ou na garagem aparecem aqui dinamicamente -->
+                    </div>
                 </div>
-                <div class="shop-panel">
-                    <h3>Upgrades da Oficina</h3>
-                    <button id="upgrade-engine-btn" class="success-btn">Melhorar Motor ($50)</button>
+
+                <div class="action-panel">
+                    <button id="work-btn" class="cartown-btn primary">Trabalhar na Oficina (+$15)</button>
+                    <button id="upgrade-engine-btn" class="cartown-btn success">Melhorar Motor</button>
                 </div>
             </div>
 
-            <!-- ABA LOJA -->
-            <div id="shop-tab" class="tab-content">
-                <div class="shop-panel">
-                    <h3>Concessionária</h3>
-                    <p>Compre novos veículos para sua frota.</p>
-                    <button id="buy-sport-car" class="success-btn">Comprar Esportivo ($300)</button>
+            <!-- ABA CONCESSIONÁRIA / LOJA -->
+            <div id="tab-shop" class="tab-pane">
+                <div class="workshop-floor">
+                    <h3>Comprar Novos Carros</h3>
+                    <div class="shop-item-card">
+                        <div>
+                            <strong>Carro Esportivo</strong>
+                            <p>Velocidade Alta - R$ 300</p>
+                        </div>
+                        <button id="buy-sport-car" class="cartown-btn success">Comprar</button>
+                    </div>
                 </div>
             </div>
         </main>
