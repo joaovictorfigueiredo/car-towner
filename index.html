@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Towner - Sua Garagem</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Car Towner</h1>
+            <div class="stats">
+                <span>Moedas: $<span id="coins">100</span></span>
+                <span>Reputação: <span id="reputation">1</span></span>
+            </div>
+        </header>
+
+        <nav class="game-nav">
+            <button class="nav-btn active" data-target="garage-tab">Garagem</button>
+            <button class="nav-btn" data-target="shop-tab">Loja de Carros</button>
+        </nav>
+
+        <main>
+            <!-- ABA GARAGEM -->
+            <div id="garage-tab" class="tab-content active">
+                <div class="car-card">
+                    <h2 id="car-name">Fusca Clássico</h2>
+                    <p>Velocidade: <span id="car-speed">10</span></p>
+                    <button id="work-btn" class="action-btn">Trabalhar na Oficina ($15)</button>
+                </div>
+                <div class="shop-panel">
+                    <h3>Upgrades da Oficina</h3>
+                    <button id="upgrade-engine-btn" class="success-btn">Melhorar Motor ($50)</button>
+                </div>
+            </div>
+
+            <!-- ABA LOJA -->
+            <div id="shop-tab" class="tab-content">
+                <div class="shop-panel">
+                    <h3>Concessionária</h3>
+                    <p>Compre novos veículos para sua frota.</p>
+                    <button id="buy-sport-car" class="success-btn">Comprar Esportivo ($300)</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
